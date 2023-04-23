@@ -36,7 +36,16 @@ export default {
   },
   methods: {
     logMeIn(user) {
-      this.authenticatedUsername = user.login;
+      axios.post('/api/tokens', user)
+          .then(response => {
+            this.authenticatedUsername=user.login;
+            const token = response.data.token;
+            axios.get('api/meetings')
+                .then(response => console.log(response.data));
+          })
+          .catch(response=>{
+            this.message= 'Logowanie nieudane';
+          })
     },
     logMeOut() {
 
