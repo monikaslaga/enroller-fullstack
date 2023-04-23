@@ -1,13 +1,13 @@
 <template>
   <div id="app">
-    <h1>Witaj w systemie do zapisów na zajęcia</h1>
+    <h1>Witaj w systemie do zapisów </h1>
 
     <div v-if="authenticatedUsername">
       <UserPanel :username="authenticatedUsername" @logout="logMeOut()"></UserPanel>
       <MeetingsPage :username="authenticatedUsername"></MeetingsPage>
     </div>
     <div v-else>
-      <button @click="signingUp = false" :class="signingUp ? 'button-outline' : ''">Loguję się</button>
+      <button @click="signingUp = false" :class="signingUp ? 'button-outline' : ''">Loguję się na zajęcia</button>
       <button @click="signingUp = true" :class="!signingUp ? 'button-outline' : ''">Rejestruję się</button>
       <div v-if="" class="alert">
         {{message}}
@@ -36,7 +36,16 @@ export default {
   },
   methods: {
     logMeIn(user) {
-      this.authenticatedUsername = user.login;
+      axios.post('/api/tokens', user)
+          .then(response => {
+            this.authenticatedUsername=user.login;
+            const token = response.data.token;
+            axios.get('api/meetings')
+                .then(response => console.log(response.data));
+          })
+          .catch(response=>{
+            this.message= 'Logowanie nieudane';
+          })
     },
     logMeOut() {
 
