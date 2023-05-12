@@ -25,6 +25,7 @@ export default {
   },
   methods: {
     addNewMeeting(meeting) {
+      
       this.meetings.push(meeting);
     },
     addMeetingParticipant(meeting) {
