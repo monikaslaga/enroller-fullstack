@@ -6,34 +6,35 @@
       <UserPanel :username="authenticatedUsername" @logout="logMeOut()"></UserPanel>
       <MeetingsPage :username="authenticatedUsername"></MeetingsPage>
     </div>
+
     <div v-else>
-      <button @click="registering = false" :class="registering ? 'button-outline' : ''">Loguję się</button>
-      <button @click="registering = true" :class="!registering ? 'button-outline' : ''">Rejestruję się</button>
-      <div :class="'alert alert-' + (this.isError ? 'error' : 'success')" v-if="message">{{ message }}</div>
-      <LoginForm v-if="registering" @login="(user) => register(user)" button-label="Załóż konto"></LoginForm>
-      <LoginForm v-else @login="(user) => logMeIn(user)"></LoginForm>
+      <button :class="signingUp ? 'button-outline' : ''" @click="signingUp = false">Logowanie</button>
+      <button :class="!signingUp ? 'button-outline' : ''" @click="signingUp = true">Rejestracja</button>
+
+      <LoginForm v-if="!signingUp" @login="(user) => logMeIn(user)"></LoginForm>
+      <LoginForm v-else @login="(user) => register(user)" button-label="Załóż konto"></LoginForm>
+      <div v-if="message" :class="isError ? 'redAlert' : 'greenAlert'">
+        {{ message }}
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import axios from "axios"
 import "milligram";
 import LoginForm from "./LoginForm";
 import UserPanel from "./UserPanel";
 import MeetingsPage from "./meetings/MeetingsPage";
 import axios from "axios";
 
-
 export default {
   components: {LoginForm, MeetingsPage, UserPanel},
   data() {
     return {
-      signinUp: false,
+      signingUp: false,
       authenticatedUsername: '',
-      registering: false,
-      message: '',
       isError: false,
+      message: ''
     }
   },
   mounted() {
@@ -42,19 +43,25 @@ export default {
     if (username && token) {
       this.storeAuth(username, token);
       // if token expired or user has been deleted - logout!
-      axios.get(`/api/meetings`).catch(() => this.logMeOut());
+      axios.get('/api/meetings').catch(() => this.logMeOut());
     }
   },
   methods: {
     register(user) {
       this.clearMessage();
+      if(user.login != null && user.password == null) {
+          this.failure(`Hasło musi zostać ustawione.`)
+      }
+      else {
       axios.post('/api/participants', user)
           .then(() => {
             this.success('Konto zostało założone. Możesz się zalogować.');
-            this.registering = false;
+            this.signingUp = false;
           })
           .catch(error => this.failure(`Błąd przy zakładaniu konta. Kod odpowiedzi: ${error.response.status}`));
+      }
     },
+
     logMeIn(user) {
       this.clearMessage();
       axios.post('/api/tokens', user)
@@ -85,31 +92,26 @@ export default {
     },
     clearMessage() {
       this.message = undefined;
-    },
+    }
   }
 }
 </script>
 
-<style>
+<style scoped>
 #app {
   max-width: 1000px;
   margin: 0 auto;
 }
 
-.alert {
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 2px solid black;
+.greenAlert {
+  margin: 10px;
+  color: green;
+  text-align: center;
 }
 
-.alert-success {
-  background: lightgreen;
-  border-color: green;
-}
-
-.alert-error {
-  background: indianred;
-  border-color: darkred;
-  color: white;
+.redAlert {
+  margin: 10px;
+  color: red;
+  text-align: center;
 }
 </style>

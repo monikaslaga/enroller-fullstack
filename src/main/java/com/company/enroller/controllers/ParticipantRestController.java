@@ -28,7 +28,7 @@ public class ParticipantRestController {
 	public ResponseEntity<?> getParticipant(@PathVariable("id") String login) {
 		Participant participant = participantService.findByLogin(login);
 		if (participant == null) {
-			return new ResponseEntity(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 		return new ResponseEntity<Participant>(participant, HttpStatus.OK);
 	}
@@ -48,7 +48,7 @@ public class ParticipantRestController {
     public ResponseEntity<?> delete(@PathVariable("id") String login) {
         Participant participant = participantService.findByLogin(login);
         if (participant == null) {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         participantService.delete(participant);
 		return new ResponseEntity<Participant>(HttpStatus.OK);
@@ -58,7 +58,7 @@ public class ParticipantRestController {
 	public ResponseEntity<?> update(@PathVariable("id") String login, @RequestBody Participant updatedParticipant) {
 		Participant participant = participantService.findByLogin(login);
 		if (participant == null) {
-			return new ResponseEntity(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 		participant.setPassword(updatedParticipant.getPassword());
 		participantService.update(participant);

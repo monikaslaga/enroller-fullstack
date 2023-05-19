@@ -29,7 +29,7 @@ public class MeetingService {
     }
 
     public Collection<Meeting> findMeetings(String title, String description, Participant participant, String sortMode) {
-        String hql = "FROM Meeting as meeting WHERE title LIKE :title AND description LIKE :description ";
+        String hql = "FROM Meeting as meeting WHERE title LIKE :title AND description LIKE :description";
         if (participant != null) {
             hql += " AND :participant in elements(participants)";
         }
